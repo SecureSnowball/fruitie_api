@@ -26,6 +26,7 @@
     "@adonisjs/core": "^5.3.4",
     "@adonisjs/repl": "^3.1.6",
     "axios": "^0.22.0",
+    "instagram-scraping": "^1.0.16",
     "node-html-parser": "^4.1.5",
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.1.13",

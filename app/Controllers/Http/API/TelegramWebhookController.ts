@@ -2,6 +2,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 import Reddit, { RedditPost } from 'App/Services/Reddit'
+import Instagram, { InstagramPost } from 'App/Services/Instagram'
 import Telegram, { TelegramPostPayload } from 'App/Services/Telegram'
 
 export default class TelegramWebhookController {
@@ -129,6 +130,13 @@ export default class TelegramWebhookController {
         postPayload.messageId = messageId
         postPayload.text = this._start
         Telegram.sendMessage(postPayload)
+      } else if (message.startsWith('/i ')) {
+        const username = message.replace('/i ', '')
+        this._fetchAndReplyInstagramPosts({
+          username,
+          chatId,
+          messageId,
+        })
       }
       response.send({ message: 'Processing...' })
     } catch (e) {
@@ -177,6 +185,48 @@ Visit: ${post.link}`
         try {
           if (post.type === 'video') await Telegram.sendVideo(telegramPostPayload)
           else await Telegram.sendImage(telegramPostPayload)
+        } catch (e) {
+          if (e?.response?.status === 429) {
+            const retryAfter = e?.response?.data?.parameters?.retry_after || 60
+            Logger.info(`Sleeping for ${retryAfter} seconds`)
+            await this._sleep(retryAfter * 1000)
+            i--
+          }
+        }
+      }
+    } catch (e) {
+      Logger.fatal(e)
+    }
+  }
+
+  private async _fetchAndReplyInstagramPosts({
+    username,
+    chatId,
+    messageId,
+  }: {
+    username: string
+    messageId: number
+    chatId: number
+  }) {
+    try {
+      const posts: InstagramPost[] = await Instagram.getPosts({ username })
+      Logger.info(
+        {
+          username,
+          messageId,
+          chatId,
+        },
+        `${posts.length} results`
+      )
+
+      for (let i = 0; i < posts.length; i++) {
+        const post = posts[i]
+        const telegramPostPayload = new TelegramPostPayload()
+        telegramPostPayload.chatId = chatId
+        telegramPostPayload.messageId = messageId
+        telegramPostPayload.imageUrl = post.url
+        try {
+          Telegram.sendImage(telegramPostPayload)
         } catch (e) {
           if (e?.response?.status === 429) {
             const retryAfter = e?.response?.data?.parameters?.retry_after || 60
