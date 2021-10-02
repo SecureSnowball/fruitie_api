@@ -108,7 +108,7 @@ class RedditApiWrapper {
         post.type = 'image'
         post.nsfw = postData.over_18
         post.author = postData.author
-        post.link = `https://reddit.com/${postData.permalink}`
+        post.link = `https://reddit.com${postData.permalink}`
         posts.push(post)
       }
       if (url.startsWith('https://v.redd.it/')) {
