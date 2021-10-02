@@ -86,7 +86,6 @@ class RedditApiWrapper {
       params.restrict_sr = 'on'
       params.q = keyword
     }
-
     const {
       data: {
         data: { children: postsObject },
@@ -111,6 +110,25 @@ class RedditApiWrapper {
         post.author = postData.author
         post.link = `https://reddit.com/${postData.permalink}`
         posts.push(post)
+      }
+      if (url.startsWith('https://v.redd.it/')) {
+        try {
+          const contentUrl = postData.secure_media.reddit_video.fallback_url
+          const post = new RedditPost()
+          post.name = postData.name
+          post.subreddit = subreddit
+          post.id = postData.id
+          post.url = contentUrl
+          post.title = postData.title
+          post.thumbnail = postData.thumbnail
+          post.type = 'video'
+          post.nsfw = postData.over_18
+          post.author = postData.author
+          posts.push(post)
+        } catch (e) {
+          Logger.info(`Unable to parse Reddit video URL: ${url}`)
+          Logger.fatal(e)
+        }
       }
       if (
         url.startsWith('https://www.redgifs.com/watch/') ||
