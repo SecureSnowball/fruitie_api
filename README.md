@@ -25,3 +25,6 @@ curl --location --request POST 'https://api.telegram.org/bot<your_telegram_bot_t
     "url": "https://<project_name>.herokuapp.com/api/webhook/telegram"
 }'
 ```
+
+### Extra
+Bot also support /i <instagram_username> but Instagram seems to be blocking heroku IPs so it doesn't work but code is there and it should work on a private IP VPS.

@@ -174,7 +174,13 @@ export default class TelegramWebhookController {
         },
         `${posts.length} results`
       )
-
+      if (!posts.length) {
+        const postPayload = new TelegramPostPayload()
+        postPayload.chatId = chatId
+        postPayload.messageId = messageId
+        postPayload.text = 'No results found'
+        return Telegram.sendMessage(postPayload)
+      }
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i]
         const telegramPostPayload = new TelegramPostPayload()
@@ -200,6 +206,7 @@ Visit: ${post.link}`
         }
       }
     } catch (e) {
+      // Add invalid subreddit and 0 matchin posts found handling
       Logger.fatal(e)
     }
   }
