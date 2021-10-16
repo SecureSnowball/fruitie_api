@@ -6,17 +6,22 @@ import Instagram, { InstagramPost } from 'App/Services/Instagram'
 import Telegram, { TelegramPostPayload } from 'App/Services/Telegram'
 
 export default class TelegramWebhookController {
-  private _start = `*Fruitie is under construction*
+  private _start = `*Bot is under construction*
 
 *To get posts use the following syntax*
 \`\`\`
 /r <subreddit> <count>
 /r programmerhumor 25
 \`\`\`
+\`\`\`
+/r programmerhumor 25
+\`\`\`
 
 *To search posts use the following syntax*
 \`\`\`
 /r s <subreddit> <keyword> <count>
+\`\`\`
+\`\`\`
 /r s programmerhumor Java 25
 \`\`\``
 
