@@ -1,4 +1,5 @@
 import Axios from 'axios'
+import Env from '@ioc:Adonis/Core/Env'
 import RedGif from 'App/Services/RedGif'
 import Logger from '@ioc:Adonis/Core/Logger'
 
@@ -73,10 +74,7 @@ class RedditApiWrapper {
     keyword?: string
   }) {
     let url = `/r/${subreddit}/hot`
-    const params: any = {
-      limit,
-      include_over_18: 'on',
-    }
+    const params: any = { limit }
     if (after) {
       params.after = `t3_${after}`
     }
@@ -109,7 +107,14 @@ class RedditApiWrapper {
         post.nsfw = postData.over_18
         post.author = postData.author
         post.link = `https://reddit.com${postData.permalink}`
-        posts.push(post)
+        if (post.nsfw) {
+          /**
+           * Only push NSFW post if ENABLE_NSFW=true in env
+           */
+          if (Env.get('ENABLE_NSFW')) posts.push(post)
+        } else {
+          posts.push(post)
+        }
       }
       if (url.startsWith('https://v.redd.it/')) {
         try {
