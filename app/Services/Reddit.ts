@@ -94,68 +94,63 @@ class RedditApiWrapper {
     const posts: RedditPost[] = []
 
     for (const { data: postData } of postsObject) {
-      const url: string = postData.url
-      if (url.endsWith('jpg') || url.endsWith('png')) {
-        const post = new RedditPost()
-        post.name = postData.name
-        post.subreddit = subreddit
-        post.id = postData.id
-        post.url = url
-        post.title = postData.title
-        post.thumbnail = postData.thumbnail
-        post.type = 'image'
-        post.nsfw = postData.over_18
-        post.author = postData.author
-        post.link = `https://reddit.com${postData.permalink}`
-        if (post.nsfw) {
-          /**
-           * Only push NSFW post if ENABLE_NSFW=true in env
-           */
-          if (Env.get('ENABLE_NSFW')) posts.push(post)
-        } else {
-          posts.push(post)
-        }
-      }
-      if (url.startsWith('https://v.redd.it/')) {
-        try {
-          const contentUrl = postData.secure_media.reddit_video.fallback_url
+      if (!postData.over_18 || (postData.over_18 && Env.get('ENABLE_NSFW'))) {
+        const url: string = postData.url
+        if (url.endsWith('jpg') || url.endsWith('png')) {
           const post = new RedditPost()
           post.name = postData.name
           post.subreddit = subreddit
           post.id = postData.id
-          post.url = contentUrl
+          post.url = url
           post.title = postData.title
           post.thumbnail = postData.thumbnail
-          post.type = 'video'
+          post.type = 'image'
           post.nsfw = postData.over_18
           post.author = postData.author
+          post.link = `https://reddit.com${postData.permalink}`
           posts.push(post)
-        } catch (e) {
-          Logger.info(`Unable to parse Reddit video URL: ${url}`)
-          Logger.fatal(e)
         }
-      }
-      if (
-        url.startsWith('https://www.redgifs.com/watch/') ||
-        url.startsWith('https://redgifs.com/watch/')
-      ) {
-        try {
-          const contentUrl = await RedGif.getMediaUrl(url)
-          Logger.info('RedGif URL parsed successfully')
-          const post = new RedditPost()
-          post.name = postData.name
-          post.subreddit = subreddit
-          post.id = postData.id
-          post.url = contentUrl
-          post.title = postData.title
-          post.thumbnail = postData.thumbnail
-          post.type = 'video'
-          post.nsfw = postData.over_18
-          post.author = postData.author
-          posts.push(post)
-        } catch (e) {
-          Logger.info(`Unable to parse RedGif URL : ${url}`)
-          Logger.fatal(e)
+        if (url.startsWith('https://v.redd.it/')) {
+          try {
+            const contentUrl = postData.secure_media.reddit_video.fallback_url
+            const post = new RedditPost()
+            post.name = postData.name
+            post.subreddit = subreddit
+            post.id = postData.id
+            post.url = contentUrl
+            post.title = postData.title
+            post.thumbnail = postData.thumbnail
+            post.type = 'video'
+            post.nsfw = postData.over_18
+            post.author = postData.author
+            posts.push(post)
+          } catch (e) {
+            Logger.info(`Unable to parse Reddit video URL: ${url}`)
+            Logger.fatal(e)
+          }
+        }
+        if (
+          url.startsWith('https://www.redgifs.com/watch/') ||
+          url.startsWith('https://redgifs.com/watch/')
+        ) {
+          try {
+            const contentUrl = await RedGif.getMediaUrl(url)
+            Logger.info('RedGif URL parsed successfully')
+            const post = new RedditPost()
+            post.name = postData.name
+            post.subreddit = subreddit
+            post.id = postData.id
+            post.url = contentUrl
+            post.title = postData.title
+            post.thumbnail = postData.thumbnail
+            post.type = 'video'
+            post.nsfw = postData.over_18
+            post.author = postData.author
+            posts.push(post)
+          } catch (e) {
+            Logger.info(`Unable to parse RedGif URL : ${url}`)
+            Logger.fatal(e)
+          }
         }
       }
     }
