@@ -4,7 +4,7 @@ on:
     branches: [master]
 
 jobs:
-  Build & Lint Test:
+  Build_n_Lint:
     runs-on: ubuntu-latest
     env:
       PORT: 3333
