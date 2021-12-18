@@ -26,5 +26,13 @@ curl --location --request POST 'https://api.telegram.org/bot<your_telegram_bot_t
 }'
 ```
 
+### Deploying to Heroku using Github actions
+
+- Get heroku API Key from https://dashboard.heroku.com/account
+- Set `HEROKU_API_KEY` in respository secrets at `https://github.com/{username}/{repo}/settings/secrets/actions`
+- Set `HEROKU_APP_NAME` in repository secrets, App name is unique name that is also used in URL.
+- Set `HEROKU_EMAIL` in repository secrets.
+
+
 ### Extra
 Bot also support /i <instagram_username> but Instagram seems to be blocking heroku IPs so it doesn't work but code is there and it should work on a private IP VPS.

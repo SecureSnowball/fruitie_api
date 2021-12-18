@@ -1,0 +1,27 @@
+name: Run Lint & Build
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  Build_n_Lint:
+    runs-on: ubuntu-latest
+    env:
+      PORT: 3333
+      HOST: 0.0.0.0
+      NODE_ENV: development
+      APP_KEY: 9754160ee2b4a2580cb5c263c9bc3d89291e82e593b7e02e8f8d5a89dab3a869
+      DRIVE_DISK: local
+      TELEGRAM_TOKEN: placeholder
+      ENABLE_NSFW: false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm ci
+
+      - name: Run Lint & Build
+        run: |
+          npm run format
+          npm run build
